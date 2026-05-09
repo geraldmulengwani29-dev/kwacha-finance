@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "kwacha-finance-ed729"
+  },
+  "targets": {
+    "kwacha-finance-ed729": {
+      "hosting": {
+        "kwachafinance": [
+          "kwachafinance"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

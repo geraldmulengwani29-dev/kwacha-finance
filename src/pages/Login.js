@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { auth } from '../firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -15,10 +17,10 @@ const Login = () => {
       await signInWithEmailAndPassword(auth, email, password);
       toast.success('Login successful!');
     } catch (error) {
-  console.log('Error code:', error.code);
-  console.log('Error message:', error.message);
-  toast.error(error.message);
-}
+      console.log('Error code:', error.code);
+      console.log('Error message:', error.message);
+      toast.error(error.message);
+    }
     setLoading(false);
   };
 
@@ -46,6 +48,10 @@ const Login = () => {
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
+        <p style={{marginTop:'15px', color:'rgba(255,255,255,0.6)', fontSize:'14px'}}>
+          Don't have an account?{' '}
+          <span onClick={() => navigate('/register')} style={{color:'#c9a84c', cursor:'pointer'}}>Register here</span>
+        </p>
       </div>
     </div>
   );
