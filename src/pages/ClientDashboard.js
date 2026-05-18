@@ -4,6 +4,7 @@ import { signOut } from 'firebase/auth';
 import { collection, query, where, getDocs, addDoc, updateDoc, doc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import logo from '../KWACHA.png';
 
 const ClientDashboard = () => {
   const navigate = useNavigate();
@@ -101,23 +102,23 @@ const ClientDashboard = () => {
     if (!amount || !startDate) return amount;
     const start = startDate.toDate ? startDate.toDate() : new Date(startDate);
     const weeks = Math.floor((new Date() - start) / (1000 * 60 * 60 * 24 * 7));
-    let total = parseFloat(amount);
-    for (let i = 0; i < weeks; i++) total += total * 0.10;
+    const principal = parseFloat(amount);
+    const total = principal + (principal * 0.10 * weeks);
     return total.toFixed(2);
   };
 
   const generateRepaymentSchedule = (amount, startDate, weeks = 8) => {
     const schedule = [];
-    let balance = parseFloat(amount);
+    const principal = parseFloat(amount);
     const start = startDate?.toDate ? startDate.toDate() : new Date();
     for (let i = 1; i <= weeks; i++) {
-      balance = balance * 1.10;
+      const totalOwed = principal + (principal * 0.10 * i);
       const dueDate = new Date(start);
       dueDate.setDate(dueDate.getDate() + (i * 7));
       schedule.push({
         week: i,
         dueDate: dueDate.toLocaleDateString(),
-        totalOwed: balance.toFixed(2),
+        totalOwed: totalOwed.toFixed(2),
       });
     }
     return schedule;
@@ -126,8 +127,14 @@ const ClientDashboard = () => {
   return (
     <div className="dashboard-container">
       <div className="sidebar">
-        <h2>Kwacha Finance</h2>
-        <p style={{color:'rgba(255,255,255,0.5)', fontSize:'13px', textAlign:'center', marginTop:'-30px', marginBottom:'30px'}}>
+        <div style={{ textAlign: 'center', padding: '20px 0 5px' }}>
+          <img
+            src={logo}
+            alt="Kwacha Finance"
+            style={{ width: '120px', height: 'auto' }}
+          />
+        </div>
+        <p style={{color:'rgba(255,255,255,0.5)', fontSize:'13px', textAlign:'center', marginBottom:'30px'}}>
           {clientData?.fullName}
         </p>
         <nav>

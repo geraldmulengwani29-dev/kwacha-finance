@@ -3,6 +3,7 @@ import { auth } from '../firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import logo from '../KWACHA.png';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -27,7 +28,13 @@ const Login = () => {
   return (
     <div className="login-container">
       <div className="login-box">
-        <h1>Kwacha Finance</h1>
+        <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+          <img
+            src={logo}
+            alt="Kwacha Finance"
+            style={{ width: '150px', height: 'auto' }}
+          />
+        </div>
         <h2>Sign In</h2>
         <form onSubmit={handleLogin}>
           <input

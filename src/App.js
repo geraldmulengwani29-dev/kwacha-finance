@@ -13,6 +13,9 @@ import Loans from './pages/Loans';
 import Payments from './pages/Payments';
 import Applications from './pages/Applications';
 import ClientDashboard from './pages/ClientDashboard';
+import Reports from './pages/Reports';
+import ClientProfile from './pages/ClientProfile';
+import AdminProfile from './pages/AdminProfile';
 import './styles/Login.css';
 import './styles/Dashboard.css';
 import './styles/Pages.css';
@@ -51,9 +54,12 @@ function App() {
         <Route path="/register" element={!user ? <Register /> : <Navigate to="/client-dashboard" />} />
         <Route path="/dashboard" element={user && role === 'admin' ? <Dashboard /> : <Navigate to="/" />} />
         <Route path="/clients" element={user && role === 'admin' ? <Clients /> : <Navigate to="/" />} />
+        <Route path="/clients/:clientId" element={user && role === 'admin' ? <ClientProfile /> : <Navigate to="/" />} />
         <Route path="/loans" element={user && role === 'admin' ? <Loans /> : <Navigate to="/" />} />
         <Route path="/payments" element={user && role === 'admin' ? <Payments /> : <Navigate to="/" />} />
         <Route path="/applications" element={user && role === 'admin' ? <Applications /> : <Navigate to="/" />} />
+        <Route path="/reports" element={user && role === 'admin' ? <Reports /> : <Navigate to="/" />} />
+        <Route path="/admin-profile" element={user && role === 'admin' ? <AdminProfile /> : <Navigate to="/" />} />
         <Route path="/client-dashboard" element={user && role === 'client' ? <ClientDashboard /> : <Navigate to="/" />} />
       </Routes>
     </Router>
