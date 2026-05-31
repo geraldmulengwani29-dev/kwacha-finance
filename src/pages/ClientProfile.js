@@ -4,6 +4,7 @@ import { collection, doc, getDoc, getDocs, updateDoc, query, where } from 'fireb
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import Sidebar from '../components/Sidebar';
+import { escapeHTML } from '../utils/security';
 
 const ClientProfile = () => {
   const navigate = useNavigate();
@@ -75,13 +76,13 @@ const ClientProfile = () => {
       const totalOwed = calculateTotalOwed(loan);
       const paid = getTotalPaid(loan.id);
       const remaining = Math.max(0, totalOwed - paid);
-      return `<tr><td>K${loan.amount}</td><td>${loan.collateral}</td><td>${weeks}</td><td>K${totalOwed.toFixed(2)}</td><td style="color:#27ae60">K${paid.toFixed(2)}</td><td style="color:${remaining > 0 ? '#e74c3c' : '#27ae60'}">${remaining > 0 ? `K${remaining.toFixed(2)}` : '✔ Cleared'}</td><td>${loan.status}</td></tr>`;
+      return `<tr><td>K${loan.amount}</td><td>${escapeHTML(loan.collateral)}</td><td>${weeks}</td><td>K${totalOwed.toFixed(2)}</td><td style="color:#27ae60">K${paid.toFixed(2)}</td><td style="color:${remaining > 0 ? '#e74c3c' : '#27ae60'}">${remaining > 0 ? `K${remaining.toFixed(2)}` : '✔ Cleared'}</td><td>${escapeHTML(loan.status)}</td></tr>`;
     }).join('');
-    const paymentsRows = payments.map(p => `<tr><td style="color:#27ae60">K${p.amount}</td><td>${formatDate(p.date)}</td><td>${p.notes || '-'}</td></tr>`).join('');
-    const appsRows = applications.map(app => `<tr><td>K${app.requestedAmount}</td><td>${app.collateral}</td><td>${app.status}</td><td>${app.offeredAmount ? `K${app.offeredAmount}` : '-'}</td><td>${formatDate(app.createdAt)}</td></tr>`).join('');
+    const paymentsRows = payments.map(p => `<tr><td style="color:#27ae60">K${p.amount}</td><td>${formatDate(p.date)}</td><td>${escapeHTML(p.notes) || '-'}</td></tr>`).join('');
+    const appsRows = applications.map(app => `<tr><td>K${app.requestedAmount}</td><td>${escapeHTML(app.collateral)}</td><td>${escapeHTML(app.status)}</td><td>${app.offeredAmount ? `K${app.offeredAmount}` : '-'}</td><td>${formatDate(app.createdAt)}</td></tr>`).join('');
     const printWindow = window.open('', '_blank');
     printWindow.document.write(`
-      <html><head><title>Kwacha Finance — ${client.fullName}</title>
+      <html><head><title>Kwacha Finance — ${escapeHTML(client.fullName)}</title>
       <style>
         body { font-family: Arial, sans-serif; padding: 30px; color: #1a2634; }
         h1 { color: #1a2634; border-bottom: 2px solid #c9a84c; padding-bottom: 10px; margin-bottom: 5px; }
@@ -101,16 +102,16 @@ const ClientProfile = () => {
         .footer { margin-top: 40px; text-align: center; color: #999; font-size: 11px; border-top: 1px solid #eee; padding-top: 15px; }
       </style></head>
       <body>
-        <h1>Client Profile — ${client.fullName}</h1>
+        <h1>Client Profile — ${escapeHTML(client.fullName)}</h1>
         <p class="meta">Generated on ${new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' })} &bull; Kwacha Finance</p>
         <h2>Personal Details</h2>
         <div class="details-grid">
-          <div class="detail-item"><label>Email</label><p>${client.email}</p></div>
-          <div class="detail-item"><label>Phone</label><p>${client.phone}</p></div>
-          <div class="detail-item"><label>NRC</label><p>${client.nrc}</p></div>
-          <div class="detail-item"><label>Employer</label><p>${client.employer}</p></div>
-          <div class="detail-item"><label>Employer Phone</label><p>${client.employerPhone || '-'}</p></div>
-          <div class="detail-item"><label>Address</label><p>${client.address || '-'}</p></div>
+          <div class="detail-item"><label>Email</label><p>${escapeHTML(client.email)}</p></div>
+          <div class="detail-item"><label>Phone</label><p>${escapeHTML(client.phone)}</p></div>
+          <div class="detail-item"><label>NRC</label><p>${escapeHTML(client.nrc)}</p></div>
+          <div class="detail-item"><label>Employer</label><p>${escapeHTML(client.employer)}</p></div>
+          <div class="detail-item"><label>Employer Phone</label><p>${escapeHTML(client.employerPhone) || '-'}</p></div>
+          <div class="detail-item"><label>Address</label><p>${escapeHTML(client.address) || '-'}</p></div>
           <div class="detail-item"><label>Member Since</label><p>${formatDate(client.createdAt)}</p></div>
         </div>
         <div class="stats-grid">
