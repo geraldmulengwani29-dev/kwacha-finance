@@ -1,0 +1,4 @@
+## 2025-05-14 - XSS in manual HTML construction for PDF Export
+**Vulnerability:** Manual HTML construction using template literals combined with `document.write()` in `ClientProfile.js` allowed for Cross-Site Scripting (XSS) via unsanitized user-controlled fields like client names, addresses, and loan notes.
+**Learning:** React's built-in XSS protection for JSX does not extend to manual string manipulation used for peripheral features like printing or exporting. Developers often overlook security when moving data outside of the primary React rendering lifecycle.
+**Prevention:** Centralize data sanitization logic. Use a dedicated `escapeHTML` utility for any manually constructed HTML strings and implement defense-in-depth by sanitizing data even if it originated from supposedly "safe" sources.
