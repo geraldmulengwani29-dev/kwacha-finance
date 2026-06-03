@@ -3,6 +3,7 @@ import { db } from '../firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import { escapeHTML } from '../utils/security';
 
 const Reports = () => {
   const navigate = useNavigate();
@@ -64,7 +65,16 @@ const Reports = () => {
   useEffect(() => { fetchData(); }, []);
 
   const handlePrint = () => {
-    const printContent = printRef.current.innerHTML;
+    const breakdownRows = clientBreakdown.map(client => `
+      <tr>
+        <td style="font-weight:600">${escapeHTML(client.name)}</td>
+        <td>${client.loans}</td>
+        <td>K${client.totalBorrowed.toFixed(2)}</td>
+        <td style="color:#27ae60">K${client.totalPaid.toFixed(2)}</td>
+        <td style="color: ${client.totalOwed > 0 ? '#e74c3c' : '#27ae60'}">${client.totalOwed > 0 ? `K${client.totalOwed.toFixed(2)}` : '✔ Cleared'}</td>
+      </tr>
+    `).join('');
+
     const printWindow = window.open('', '_blank');
     printWindow.document.write(`
       <html><head><title>Kwacha Finance — Report</title>
@@ -85,7 +95,30 @@ const Reports = () => {
       <body>
         <h1>Kwacha Finance — Financial Report</h1>
         <p style="color:#666; margin-top:-5px;">Generated on ${new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' })}</p>
-        ${printContent}
+
+        <div class="stats-grid">
+          <div class="stat-card"><h3>Total Disbursed</h3><p style="color:#c9a84c">K${data.totalDisbursed.toLocaleString()}</p></div>
+          <div class="stat-card"><h3>Total Collected</h3><p style="color:#27ae60">K${data.totalCollected.toLocaleString()}</p></div>
+          <div class="stat-card"><h3>Outstanding Balance</h3><p style="color:#e74c3c">K${data.totalOutstanding.toFixed(2)}</p></div>
+          <div class="stat-card"><h3>Total Clients</h3><p>${data.totalClients}</p></div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card"><h3>Active Loans</h3><p style="color:#c9a84c">${data.activeLoans}</p></div>
+          <div class="stat-card"><h3>Completed Loans</h3><p style="color:#27ae60">${data.completedLoans}</p></div>
+          <div class="stat-card"><h3>Overdue Loans</h3><p style="color: ${data.overdueLoans > 0 ? '#e74c3c' : '#27ae60'}">${data.overdueLoans}</p></div>
+          <div class="stat-card"><h3>Collection Rate</h3><p style="color:#c9a84c">${collectionRate}%</p></div>
+        </div>
+
+        <h2>Client Breakdown</h2>
+        <table>
+          <thead>
+            <tr><th>Client</th><th>Total Loans</th><th>Total Borrowed (K)</th><th>Total Paid (K)</th><th>Outstanding (K)</th></tr>
+          </thead>
+          <tbody>
+            ${breakdownRows || '<tr><td colspan="5" style="text-align:center;padding:20px;color:#999">No data yet</td></tr>'}
+          </tbody>
+        </table>
+
         <div class="footer">Kwacha Finance &bull; kwachafinance.web.app &bull; Confidential</div>
       </body></html>
     `);
