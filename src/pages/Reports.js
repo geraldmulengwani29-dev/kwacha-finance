@@ -64,10 +64,13 @@ const Reports = () => {
   useEffect(() => { fetchData(); }, []);
 
   const handlePrint = () => {
+    // printRef.current.innerHTML contains React-rendered content which is already escaped by React.
+    // As a defense-in-depth measure, ensure any manual HTML construction around it is safe.
+    // Currently, all dynamic content in this file is managed via React state before being captured.
     const printContent = printRef.current.innerHTML;
     const printWindow = window.open('', '_blank');
     printWindow.document.write(`
-      <html><head><title>Kwacha Finance — Report</title>
+      <html><head><title>Kwacha Finance — Financial Report</title>
       <style>
         body { font-family: Arial, sans-serif; padding: 30px; color: #1a2634; }
         h1 { color: #1a2634; border-bottom: 2px solid #c9a84c; padding-bottom: 10px; }
