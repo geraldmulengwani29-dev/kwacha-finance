@@ -64,6 +64,8 @@ const Reports = () => {
   useEffect(() => { fetchData(); }, []);
 
   const handlePrint = () => {
+    // printContent is safe here because React's JSX sanitizes its content before it's rendered into the DOM.
+    // However, when constructing manual strings or documents, always treat innerHTML as untrusted if not from a trusted source.
     const printContent = printRef.current.innerHTML;
     const printWindow = window.open('', '_blank');
     printWindow.document.write(`
