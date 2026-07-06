@@ -3,6 +3,7 @@ import { db } from '../firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import { escapeHTML } from '../utils/security';
 
 const Reports = () => {
   const navigate = useNavigate();
@@ -84,7 +85,7 @@ const Reports = () => {
       </style></head>
       <body>
         <h1>Kwacha Finance — Financial Report</h1>
-        <p style="color:#666; margin-top:-5px;">Generated on ${new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' })}</p>
+        <p style="color:#666; margin-top:-5px;">Generated on ${escapeHTML(new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' }))}</p>
         ${printContent}
         <div class="footer">Kwacha Finance &bull; kwachafinance.web.app &bull; Confidential</div>
       </body></html>
