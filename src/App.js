@@ -33,7 +33,8 @@ function App() {
         if (clientDoc.exists()) {
           setRole(clientDoc.data().role || 'client');
         } else {
-          setRole('admin');
+          // Security: Default to 'client' instead of 'admin' if user document is missing (fail-secure)
+          setRole('client');
         }
       } else {
         setUser(null);
