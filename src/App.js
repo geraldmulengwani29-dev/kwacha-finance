@@ -33,7 +33,8 @@ function App() {
         if (clientDoc.exists()) {
           setRole(clientDoc.data().role || 'client');
         } else {
-          setRole('admin');
+          // Default to 'client' if profile is missing to prevent admin bypass
+          setRole('client');
         }
       } else {
         setUser(null);
