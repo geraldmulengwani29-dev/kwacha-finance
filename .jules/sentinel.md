@@ -1,0 +1,4 @@
+## 2026-07-14 - Fail-Open Authorization Bypass in Client vs Admin Role Resolution
+**Vulnerability:** A fail-open authorization bypass in `src/App.js` where users without a corresponding Firestore document were previously granted 'admin' privileges; the default was changed to 'client'.
+**Learning:** During user authentication state changes, querying Firestore client profile to determine the user role fell back to 'admin' when the document was not found or failed to load. Under database lookup failures or user profiles being missing/uncreated, unauthorized users were granted full administrative rights.
+**Prevention:** Always adopt a fail-closed approach by defaulting authorization logic to the lowest-privilege role ('client') whenever a user document is missing or retrieval fails. Ensure error handling (try-catch) wraps all database calls during role resolution to gracefully handle transient network or query errors.
