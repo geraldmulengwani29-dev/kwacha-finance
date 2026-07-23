@@ -1,0 +1,4 @@
+## 2026-07-14 - Remediate Hardcoded Firebase Secrets
+**Vulnerability:** Hardcoded Firebase client configuration, including active API keys and App ID, inside `src/firebase.js`.
+**Learning:** Hardcoded credentials are often committed to source control during initial setup or rapid prototyping. When these configurations are left unchanged in production, they expose service endpoints and client credentials to anyone with access to the source code repository, potentially leading to API abuse or unauthorized database connections.
+**Prevention:** Always use environment-specific files (e.g., `.env`) for secret management and configuration settings. Ensure template files like `.env.example` are committed as guides, while actual secret-containing files like `.env` are strictly listed in `.gitignore` and kept out of version control.
