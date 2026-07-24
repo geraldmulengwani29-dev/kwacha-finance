@@ -27,19 +27,28 @@ function App() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-        const clientDoc = await getDoc(doc(db, 'clients', currentUser.uid));
-        if (clientDoc.exists()) {
-          setRole(clientDoc.data().role || 'client');
+      try {
+        if (currentUser) {
+          setUser(currentUser);
+          const clientDoc = await getDoc(doc(db, 'clients', currentUser.uid));
+          if (clientDoc.exists()) {
+            setRole(clientDoc.data().role || 'client');
+          } else {
+            // Default to 'client' (fail-closed) if no document exists
+            setRole('client');
+          }
         } else {
-          setRole('admin');
+          setUser(null);
+          setRole(null);
         }
-      } else {
+      } catch (error) {
+        console.error("Auth state change error:", error);
+        // On error, clear auth/role to fail securely
         setUser(null);
         setRole(null);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
     return unsubscribe;
   }, []);
