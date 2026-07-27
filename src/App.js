@@ -27,19 +27,28 @@ function App() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-        const clientDoc = await getDoc(doc(db, 'clients', currentUser.uid));
-        if (clientDoc.exists()) {
-          setRole(clientDoc.data().role || 'client');
+      try {
+        if (currentUser) {
+          setUser(currentUser);
+          const clientDoc = await getDoc(doc(db, 'clients', currentUser.uid));
+          if (clientDoc.exists()) {
+            setRole(clientDoc.data().role || 'client');
+          } else {
+            // Security: Default to 'client' (not 'admin') to avoid fail-open auth bypass
+            setRole('client');
+          }
         } else {
-          setRole('admin');
+          setUser(null);
+          setRole(null);
         }
-      } else {
+      } catch (error) {
+        console.error('Error fetching user role from Firestore:', error);
+        // Security fallback: clear user and role on database error
         setUser(null);
         setRole(null);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
     return unsubscribe;
   }, []);
