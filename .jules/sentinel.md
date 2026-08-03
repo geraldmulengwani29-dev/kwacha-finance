@@ -1,0 +1,4 @@
+## 2026-07-14 - Fail-Open Authorization Bypass in App Role Routing
+**Vulnerability:** The application fell back to granting 'admin' role privileges if a user's Firestore client profile document did not exist or failed to be fetched in `onAuthStateChanged`.
+**Learning:** Defaulting to the highest level of privilege when data is missing or loading fails creates a severe fail-open vulnerability. In this codebase, unregistered users or users with transient database lookup failures could have bypassed security restrictions to escalate their privileges to 'admin'.
+**Prevention:** Always follow a fail-secure design. Default to the minimum required privilege level (such as 'client' or no role) if a user profile is missing or if query/lookup errors occur. Wrap async operations in try-catch blocks to handle errors gracefully without breaking application state or leaking sensitive execution paths.
