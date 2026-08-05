@@ -1,0 +1,4 @@
+## 2026-07-14 - Fail-Open Authorization Bypass
+**Vulnerability:** In `src/App.js`, if an authenticated user did not have a corresponding Firestore document in the 'clients' collection, or if fetching the document failed, the application defaulted the user's role to 'admin', thereby granting complete administrative access to arbitrary or unprovisioned users.
+**Learning:** The default role assignment fell back to 'admin' when the Firestore document check returned `.exists() === false`. In secure-by-default architecture, fallback roles must always be the lowest-privileged role (such as 'client' or 'guest') to prevent privilege escalation when data or lookups fail.
+**Prevention:** Always use fail-secure defaults when evaluating roles or authorization. If a user record is missing, corrupted, or unreachable, default to the least-privileged role and handle errors gracefully with a try-catch block to avoid exposing unauthorized capabilities.
