@@ -1,0 +1,4 @@
+## 2026-07-14 - Fail-Open Authorization Bypass in App.js
+**Vulnerability:** The application was vulnerable to a fail-open authorization bypass. During the `onAuthStateChanged` hook, if a user's corresponding document was missing in the Firestore `clients` collection, the user role defaulted to `'admin'`.
+**Learning:** This fail-open logic meant that any user who successfully authenticated but lacked a matching client profile document (or experienced database lookup failures) was granted full administrative privileges, exposing sensitive administrative dashboards and client data.
+**Prevention:** Always default to the least privileged role (such as `'client'`) and implement comprehensive error handling with try-catch blocks to ensure that database lookup errors do not result in privileges being escalated.
