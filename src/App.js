@@ -27,19 +27,27 @@ function App() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-        const clientDoc = await getDoc(doc(db, 'clients', currentUser.uid));
-        if (clientDoc.exists()) {
-          setRole(clientDoc.data().role || 'client');
+      try {
+        if (currentUser) {
+          setUser(currentUser);
+          const clientDoc = await getDoc(doc(db, 'clients', currentUser.uid));
+          if (clientDoc.exists()) {
+            setRole(clientDoc.data().role || 'client');
+          } else {
+            // Default to 'client' (secure default) to prevent unauthorized admin access when Firestore document is missing
+            setRole('client');
+          }
         } else {
-          setRole('admin');
+          setUser(null);
+          setRole(null);
         }
-      } else {
-        setUser(null);
-        setRole(null);
+      } catch (error) {
+        console.error("Sentinel Error: Failed to fetch user role securely, defaulting to client.", error);
+        // Default to 'client' role as a secure fail-closed posture during auth document query failures
+        setRole('client');
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
     return unsubscribe;
   }, []);
