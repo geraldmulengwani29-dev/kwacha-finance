@@ -1,0 +1,4 @@
+## 2026-07-14 - Fail-Open Authorization Bypass
+**Vulnerability:** A fail-open authorization bypass existed in the global authentication hook within `src/App.js` where users without an explicit Firestore document or whose Firestore document lookup failed were defaulted to the 'admin' role.
+**Learning:** Defaulting to elevated privileges ('admin') when database lookups fail or records are missing introduces a critical authorization bypass vector. Under failure conditions or for unprofiled users, the system must always fail secure and closed.
+**Prevention:** Always implement a fail-secure/fail-closed architecture where the default fallback role is the least privileged role ('client') and wrap document requests in robust try-catch handlers to prevent authorization state leakage during runtime errors.
