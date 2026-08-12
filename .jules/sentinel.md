@@ -1,0 +1,4 @@
+## 2026-07-14 - Fail-Open Authorization Bypass in App.js
+**Vulnerability:** A fail-open authorization bypass in `src/App.js` where users without a corresponding Firestore document were defaulted to the 'admin' role. Additionally, any network or database exception while querying the user profile would prevent safe role evaluation, risking similar bypass.
+**Learning:** The application fell back to 'admin' as a default role when the user document didn't exist in Firestore, which fails open instead of failing closed/secure. Defaulting to high privileges is an insecure design pattern.
+**Prevention:** Always default to the lowest privilege role ('client') when user document check fails or encounters database/network exceptions. Wrap database operations in try-catch to ensure clean fallback logic and prevent authorized state bypass.

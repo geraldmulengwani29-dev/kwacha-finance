@@ -29,11 +29,18 @@ function App() {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
-        const clientDoc = await getDoc(doc(db, 'clients', currentUser.uid));
-        if (clientDoc.exists()) {
-          setRole(clientDoc.data().role || 'client');
-        } else {
-          setRole('admin');
+        try {
+          const clientDoc = await getDoc(doc(db, 'clients', currentUser.uid));
+          if (clientDoc.exists()) {
+            setRole(clientDoc.data().role || 'client');
+          } else {
+            // Default to 'client' for fail-secure behavior when profile is missing
+            setRole('client');
+          }
+        } catch (error) {
+          console.error('[Sentinel Error] Failed to fetch user role from Firestore:', error);
+          // Default to 'client' for fail-secure behavior on query/network failure
+          setRole('client');
         }
       } else {
         setUser(null);
