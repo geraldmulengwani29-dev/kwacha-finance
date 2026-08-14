@@ -27,19 +27,27 @@ function App() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-        const clientDoc = await getDoc(doc(db, 'clients', currentUser.uid));
-        if (clientDoc.exists()) {
-          setRole(clientDoc.data().role || 'client');
+      try {
+        if (currentUser) {
+          setUser(currentUser);
+          const clientDoc = await getDoc(doc(db, 'clients', currentUser.uid));
+          if (clientDoc.exists()) {
+            setRole(clientDoc.data().role || 'client');
+          } else {
+            // Secure Default: Unmapped user defaults to 'client' (least privilege)
+            setRole('client');
+          }
         } else {
-          setRole('admin');
+          setUser(null);
+          setRole(null);
         }
-      } else {
-        setUser(null);
-        setRole(null);
+      } catch (error) {
+        console.error("Auth state logic error:", error);
+        // Fallback to least privileged role in case of database or fetch errors
+        setRole('client');
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
     return unsubscribe;
   }, []);
