@@ -29,11 +29,17 @@ function App() {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
-        const clientDoc = await getDoc(doc(db, 'clients', currentUser.uid));
-        if (clientDoc.exists()) {
-          setRole(clientDoc.data().role || 'client');
-        } else {
-          setRole('admin');
+        try {
+          const clientDoc = await getDoc(doc(db, 'clients', currentUser.uid));
+          if (clientDoc.exists()) {
+            setRole(clientDoc.data().role || 'client');
+          } else {
+            // Fail securely: default to 'client' role if client document does not exist
+            setRole('client');
+          }
+        } catch (error) {
+          // Fail securely: default to 'client' role on firestore read error
+          setRole('client');
         }
       } else {
         setUser(null);
