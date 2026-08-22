@@ -29,11 +29,18 @@ function App() {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
-        const clientDoc = await getDoc(doc(db, 'clients', currentUser.uid));
-        if (clientDoc.exists()) {
-          setRole(clientDoc.data().role || 'client');
-        } else {
-          setRole('admin');
+        try {
+          // Security: Default to 'client' (least privilege) if document doesn't exist or on error.
+          // Never default to 'admin' (fail-closed authorization pattern).
+          const clientDoc = await getDoc(doc(db, 'clients', currentUser.uid));
+          if (clientDoc.exists()) {
+            setRole(clientDoc.data().role || 'client');
+          } else {
+            setRole('client');
+          }
+        } catch (error) {
+          console.error('Error fetching user document from Firestore:', error);
+          setRole('client');
         }
       } else {
         setUser(null);
