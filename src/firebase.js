@@ -2,14 +2,19 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
+// Note: Create React App requires environment variables to start with REACT_APP_
 const firebaseConfig = {
-  apiKey: "AIzaSyBfmh_Rnf-ZVST1ZiCDcqB4K44qcPVY608",
-  authDomain: "kwacha-finance-ed729.firebaseapp.com",
-  projectId: "kwacha-finance-ed729",
-  storageBucket: "kwacha-finance-ed729.firebasestorage.app",
-  messagingSenderId: "353305719524",
-  appId: "1:353305719524:web:6091c9e33b4e0d80e532f1"
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID
 };
+
+if (process.env.NODE_ENV !== 'production' && !process.env.REACT_APP_FIREBASE_API_KEY) {
+  console.warn('Firebase API Key missing from environment variables. Copy .env.example to .env');
+}
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
