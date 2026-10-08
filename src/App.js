@@ -29,11 +29,17 @@ function App() {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
-        const clientDoc = await getDoc(doc(db, 'clients', currentUser.uid));
-        if (clientDoc.exists()) {
-          setRole(clientDoc.data().role || 'client');
-        } else {
-          setRole('admin');
+        try {
+          const clientDoc = await getDoc(doc(db, 'clients', currentUser.uid));
+          // SECURITY: Fail secure - default to 'client' role if doc or role is missing
+          if (clientDoc.exists()) {
+            setRole(clientDoc.data().role || 'client');
+          } else {
+            setRole('client');
+          }
+        } catch (err) {
+          // SECURITY: Default to 'client' on error to prevent authorization bypass
+          setRole('client');
         }
       } else {
         setUser(null);
