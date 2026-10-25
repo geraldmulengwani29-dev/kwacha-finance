@@ -29,11 +29,18 @@ function App() {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
-        const clientDoc = await getDoc(doc(db, 'clients', currentUser.uid));
-        if (clientDoc.exists()) {
-          setRole(clientDoc.data().role || 'client');
-        } else {
-          setRole('admin');
+        try {
+          const clientDoc = await getDoc(doc(db, 'clients', currentUser.uid));
+          if (clientDoc.exists()) {
+            setRole(clientDoc.data().role || 'client');
+          } else {
+            // Default to least-privileged role ('client') if document is missing
+            setRole('client');
+          }
+        } catch (error) {
+          console.error('Error fetching user role:', error);
+          // Fail securely by defaulting to least-privileged role
+          setRole('client');
         }
       } else {
         setUser(null);
