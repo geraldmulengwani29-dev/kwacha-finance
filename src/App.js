@@ -29,11 +29,19 @@ function App() {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
-        const clientDoc = await getDoc(doc(db, 'clients', currentUser.uid));
-        if (clientDoc.exists()) {
-          setRole(clientDoc.data().role || 'client');
-        } else {
-          setRole('admin');
+        try {
+          const clientDoc = await getDoc(doc(db, 'clients', currentUser.uid));
+          if (clientDoc.exists()) {
+            setRole(clientDoc.data().role || 'client');
+          } else {
+            // SECURITY: Default missing user records to 'client' (least privilege)
+            // to prevent fail-open admin authorization bypass.
+            setRole('client');
+          }
+        } catch (error) {
+          console.error("Error fetching user document:", error);
+          // SECURITY: Default to 'client' on error to fail closed safely
+          setRole('client');
         }
       } else {
         setUser(null);
