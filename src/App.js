@@ -29,11 +29,18 @@ function App() {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
-        const clientDoc = await getDoc(doc(db, 'clients', currentUser.uid));
-        if (clientDoc.exists()) {
-          setRole(clientDoc.data().role || 'client');
-        } else {
-          setRole('admin');
+        try {
+          const clientDoc = await getDoc(doc(db, 'clients', currentUser.uid));
+          if (clientDoc.exists()) {
+            setRole(clientDoc.data().role || 'client');
+          } else {
+            // Secure default: default unmapped users to client role to avoid fail-open auth bypass
+            setRole('client');
+          }
+        } catch (error) {
+          console.error('Error fetching user document:', error);
+          // Fail securely: fallback to least-privileged client role on lookup error
+          setRole('client');
         }
       } else {
         setUser(null);
